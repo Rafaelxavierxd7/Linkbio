@@ -2,13 +2,6 @@
 // Princípio: se a configuração de segurança estiver ausente ou incompleta,
 // a aplicação deve falhar FECHADA (bloquear acesso) e nunca abrir por default.
 
-const REQUIRED_PUBLIC_VARS = [
-  "NEXT_PUBLIC_SUPABASE_URL",
-  "NEXT_PUBLIC_SUPABASE_ANON_KEY",
-] as const;
-
-const REQUIRED_SERVER_VARS = ["SUPABASE_SERVICE_ROLE_KEY"] as const;
-
 class ConfigurationError extends Error {
   constructor(missing: string[]) {
     super(
@@ -22,13 +15,15 @@ class ConfigurationError extends Error {
 
 /** Usar em qualquer código que rode no navegador ou no servidor. */
 export function assertPublicEnv() {
-  const missing = REQUIRED_PUBLIC_VARS.filter((key) => !process.env[key]);
+  const missing: string[] = [];
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL) missing.push("NEXT_PUBLIC_SUPABASE_URL");
+  if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) missing.push("NEXT_PUBLIC_SUPABASE_ANON_KEY");
   if (missing.length) throw new ConfigurationError(missing);
 }
 
 /** Usar apenas em código server-only que também precisa da service role key. */
 export function assertServerEnv() {
   assertPublicEnv();
-  const missing = REQUIRED_SERVER_VARS.filter((key) => !process.env[key]);
-  if (missing.length) throw new ConfigurationError(missing);
-}
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    throw new ConfigurationError(["SUPABASE_SERVICE_ROLE_KEY"]);
+  }
