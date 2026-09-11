@@ -27,4 +27,4 @@ export function assertServerEnv() {
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
     throw new ConfigurationError(["SUPABASE_SERVICE_ROLE_KEY"]);
   }
-}  
+}
